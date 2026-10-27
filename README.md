@@ -1,3 +1,4 @@
+
 # D&D Microservices
 
 Phase 1: everything runs locally as separate processes. Docker and orchestration come next.
@@ -51,3 +52,7 @@ Reset HP with `POST /characters/goblin/reset`.
 
 `NdM`, optional keep highest/lowest (`kh`/`kl`), optional modifier: `d20`, `2d6+3`, `4d6kh3`, `1d20-1`.
 Limits: 1-100 dice, 2-1000 sides. Nat 20 / nat 1 are flagged on single d20 rolls.
+
+# dnd
+lets play
+
