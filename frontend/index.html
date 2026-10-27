@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111313">
+  <title>Ember & Iron — D&D Skirmish</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Ember and Iron home">
+        <span class="brand-mark" aria-hidden="true">E</span>
+        <span>EMBER <span class="brand-amp">&</span> IRON</span>
+      </a>
+      <a class="nav-link" href="/static/create-character.html">Create character <span aria-hidden="true">↗</span></a>
+      <div class="connection"><span class="connection-dot"></span><span id="connection-label">Connecting to game</span></div>
+    </header>
+    <div class="file-warning" id="file-warning" hidden>
+      This page was opened as a file, so it cannot connect to the game services.
+      <a href="http://localhost:8000/">Open the game through the gateway →</a>
+    </div>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-line"></span> A QUICK D&D SKIRMISH</p>
+          <h1>Your story<br>starts <em>here.</em></h1>
+          <p class="hero-description">Gather your courage, roll initiative, and see who survives the encounter.</p>
+          <button class="button button-primary" id="start-button" type="button">
+            <span>Roll for initiative</span><span aria-hidden="true">↗</span>
+          </button>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-glow"></div>
+          <div class="sun-disc"></div>
+          <div class="mountain mountain-back"></div>
+          <div class="mountain mountain-front"></div>
+          <div class="art-sword">✳</div>
+          <div class="art-caption">THE OLD ROAD · SESSION 01</div>
+        </div>
+      </section>
+
+      <section class="battle-section" aria-labelledby="battle-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">THE ENCOUNTER</p>
+            <h2 id="battle-heading">On the field</h2>
+          </div>
+          <div class="round-badge" id="round-label">Awaiting initiative</div>
+        </div>
+
+        <div class="battle-grid">
+          <div class="combatants" id="combatants" aria-live="polite">
+            <div class="empty-state" id="empty-state">
+              <span class="empty-die" aria-hidden="true">d20</span>
+              <p>Your combatants will appear here.</p>
+              <span>Roll initiative to begin the encounter.</span>
+            </div>
+          </div>
+
+          <aside class="turn-panel">
+            <p class="eyebrow">YOUR MOVE</p>
+            <h3 id="turn-title">Ready when you are</h3>
+            <p class="turn-hint" id="turn-hint">Start the encounter to find out who acts first.</p>
+
+            <label class="field-label" for="target-select">Choose a target</label>
+            <select id="target-select" disabled>
+              <option value="">Roll initiative first</option>
+            </select>
+
+            <div class="roll-modes" role="group" aria-label="Attack roll mode">
+              <button type="button" class="mode-button selected" data-mode="normal" aria-pressed="true">Normal</button>
+              <button type="button" class="mode-button" data-mode="advantage" aria-pressed="false">Advantage</button>
+              <button type="button" class="mode-button" data-mode="disadvantage" aria-pressed="false">Disadvantage</button>
+            </div>
+
+            <button class="button button-attack" id="attack-button" type="button" disabled>
+              <span>Make an attack</span><span aria-hidden="true">⚔</span>
+            </button>
+            <button class="button button-defend" id="defend-button" type="button" disabled>
+              <span>Defend</span><span aria-hidden="true">⛨</span>
+            </button>
+            <button class="button button-next" id="next-button" type="button" disabled>End turn <span aria-hidden="true">→</span></button>
+            <button class="text-button" id="reset-button" type="button">Reset Goblin HP</button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="log-section" aria-labelledby="log-heading">
+        <div class="log-heading">
+          <div>
+            <p class="eyebrow">THE CHRONICLE</p>
+            <h2 id="log-heading">Battle log</h2>
+          </div>
+          <button class="text-button" id="clear-log" type="button">Clear log</button>
+        </div>
+        <ol class="battle-log" id="battle-log" aria-live="polite">
+          <li class="log-placeholder">The chronicle is quiet… for now.</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer><span>EMBER & IRON</span><span>A little adventure, one roll at a time.</span></footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="roll-overlay" id="roll-overlay" hidden>
+    <div class="roll-dialog" role="status" aria-live="polite">
+      <p class="eyebrow">THE DICE ARE CAST</p>
+      <div class="roll-face" id="roll-face" aria-hidden="true">20</div>
+      <p class="roll-caption" id="roll-caption">Rolling...</p>
+    </div>
+  </div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
