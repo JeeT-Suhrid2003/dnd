@@ -37,6 +37,7 @@ async def frontend_script():
 
 
 @app.get("/health")
+@app.get("/api/v1/health", include_in_schema=False)
 async def health():
     async def check(name: str, base: str):
         try:
@@ -52,6 +53,8 @@ async def health():
 
 @app.api_route("/{service}/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
 @app.api_route("/{service}", methods=["GET", "POST"])
+@app.api_route("/api/v1/{service}/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
+@app.api_route("/api/v1/{service}", methods=["GET", "POST"])
 async def proxy(service: str, request: Request, path: str = ""):
     if service not in UPSTREAMS:
         return Response(

@@ -35,6 +35,40 @@ http://localhost:8000/docs (or on each service at http://localhost:800X/docs).
 Open the game through this address, not by double-clicking
 `frontend/index.html`, so its requests can connect to the API.
 
+## Local Kubernetes HTTPS with Ingress
+
+The NGINX Ingress routes `https://dnd.example.com/` to the gateway. The
+frontend sends API requests under `/api/v1/`, such as
+`/api/v1/characters` and `/api/v1/combat/initiative`; the gateway forwards
+those to the internal services.
+
+On Windows, install and initialize [mkcert](https://github.com/FiloSottile/mkcert),
+then create a locally trusted certificate and Kubernetes TLS Secret:
+
+    winget install --id FiloSottile.Mkcert -e
+    mkcert -install
+    mkcert -cert-file dnd.example.com.pem -key-file dnd.example.com-key.pem dnd.example.com
+    kubectl create secret tls dnd-local-tls --cert=dnd.example.com.pem --key=dnd.example.com-key.pem --dry-run=client -o yaml | kubectl apply -f -
+
+Add `127.0.0.1 dnd.example.com` to the Windows hosts file at
+`C:\Windows\System32\drivers\etc\hosts` using an administrator editor. Build
+the updated gateway image and apply the Kubernetes manifests:
+
+    docker build -f services/gateway/Dockerfile -t dnd-gateway .
+    kubectl apply -f .\k8s\deployment.yml
+    kubectl apply -f .\k8s\service.yml
+    kubectl apply -f .\k8s\ingress.yml
+    kubectl rollout status deployment/dnd-gateway
+
+Docker Desktop does not directly publish the Ingress controller to Windows, so
+forward its HTTPS port in a separate terminal:
+
+    kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 443:443
+
+With that command running, open **https://dnd.example.com/**. Keep the
+certificate and private key files out of source control; the TLS Secret stores
+the certificate in Kubernetes.
+
 ## Gateway Docker image
 
 Build from the repository root so Docker can copy both the gateway code and

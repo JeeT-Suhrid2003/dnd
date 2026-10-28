@@ -34,7 +34,7 @@ let toastTimer;
 async function request(path, options = {}) {
   let response;
   try {
-    response = await fetch(path, {
+    response = await fetch(`/api/v1${path}`, {
       ...options,
       headers: { "Content-Type": "application/json", ...options.headers },
     });

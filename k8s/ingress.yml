@@ -5,8 +5,13 @@ metadata:
   namespace: default
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - dnd.example.com
+      secretName: dnd-local-tls
   rules:
-    - http:
+    - host: dnd.example.com
+      http:
         paths:
           - path: /
             pathType: Prefix
