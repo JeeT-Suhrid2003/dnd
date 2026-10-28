@@ -135,4 +135,4 @@ Limits: 1-100 dice, 2-1000 sides. Nat 20 / nat 1 are flagged on single d20 rolls
 
 # dnd
 lets play
-![Project Logo](Screenshot 2026-10-28 181220.png)
+![Project Logo]([Screenshot 2026-10-28 181220.png](https://github.com/JeeT-Suhrid2003/dnd/blob/main/Screenshot%202026-10-28%20181220.png))
