@@ -42,17 +42,26 @@ frontend sends API requests under `/api/v1/`, such as
 `/api/v1/characters` and `/api/v1/combat/initiative`; the gateway forwards
 those to the internal services.
 
-On Windows, install and initialize [mkcert](https://github.com/FiloSottile/mkcert),
-then create a locally trusted certificate and Kubernetes TLS Secret:
+On Windows, install and initialize [mkcert](https://github.com/FiloSottile/mkcert)
+as the same user account that runs your browser. This creates a local
+certificate authority trusted by Windows and Chrome:
 
     winget install --id FiloSottile.Mkcert -e
     mkcert -install
-    mkcert -cert-file dnd.example.com.pem -key-file dnd.example.com-key.pem dnd.example.com
-    kubectl create secret tls dnd-local-tls --cert=dnd.example.com.pem --key=dnd.example.com-key.pem --dry-run=client -o yaml | kubectl apply -f -
+
+Create a certificate and key in a local directory, then store them in the
+Kubernetes TLS Secret:
+
+    $certDir = "$env:USERPROFILE\.dnd-local-certs"
+    New-Item -ItemType Directory -Force $certDir | Out-Null
+    mkcert -cert-file "$certDir\dnd.example.com.pem" -key-file "$certDir\dnd.example.com-key.pem" dnd.example.com
+    kubectl create secret tls dnd-local-tls --cert="$certDir\dnd.example.com.pem" --key="$certDir\dnd.example.com-key.pem" --dry-run=client -o yaml | kubectl apply -f -
 
 Add `127.0.0.1 dnd.example.com` to the Windows hosts file at
-`C:\Windows\System32\drivers\etc\hosts` using an administrator editor. Build
-the updated gateway image and apply the Kubernetes manifests:
+`C:\Windows\System32\drivers\etc\hosts` using an administrator editor. If
+Windows does not resolve it immediately, run `ipconfig /flushdns`.
+
+Build the updated gateway image and apply the Kubernetes manifests:
 
     docker build -f services/gateway/Dockerfile -t dnd-gateway .
     kubectl apply -f .\k8s\deployment.yml
@@ -61,13 +70,25 @@ the updated gateway image and apply the Kubernetes manifests:
     kubectl rollout status deployment/dnd-gateway
 
 Docker Desktop does not directly publish the Ingress controller to Windows, so
-forward its HTTPS port in a separate terminal:
+forward its HTTPS port in a separate PowerShell terminal and leave it running:
 
     kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 443:443
 
-With that command running, open **https://dnd.example.com/**. Keep the
-certificate and private key files out of source control; the TLS Secret stores
-the certificate in Kubernetes.
+Open **https://dnd.example.com/** with the port-forward active. Verify from
+another terminal with:
+
+    curl.exe https://dnd.example.com/
+
+If the hostname has not been added to the hosts file yet, test routing without
+changing DNS with:
+
+    curl.exe --resolve dnd.example.com:443:127.0.0.1 https://dnd.example.com/
+
+If curl reports `SEC_E_UNTRUSTED_ROOT`, run `mkcert -install` as the same
+Windows user running curl and Chrome, regenerate the certificate above, and
+reapply the TLS Secret command. Do not use `curl -k` as the permanent fix; it
+skips certificate verification. Keep the certificate and private key files
+out of source control; the TLS Secret stores the certificate in Kubernetes.
 
 ## Gateway Docker image
 
