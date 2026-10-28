@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    thing: dice
+  name: dnd-dice
+spec:
+  ports:
+  - port: 8001
+    protocol: TCP
+    targetPort: 8001
+  selector:
+    thing: dnd-dice
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    thing: character
+  name: dnd-character
+spec:
+  ports:
+  - port: 8002
+    protocol: TCP
+    targetPort: 8002
+  selector:
+    thing: dnd-character
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    thing: combat
+  name: dnd-combat
+spec:
+  ports:
+  - port: 8003
+    protocol: TCP
+    targetPort: 8003
+  selector:
+    thing: dnd-combat
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    thing: gateway
+  name: dnd-gateway
+spec:
+  ports:
+  - port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    thing: dnd-gateway
+  type: ClusterIP
+status:
+  loadBalancer: {}

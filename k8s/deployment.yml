@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dnd-dice
+  labels:
+    thing: dice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      thing: dnd-dice
+  template:
+    metadata:
+      labels:
+        thing: dnd-dice
+    spec:
+      containers:
+        - name: dnd-dice
+          image: dnd-dice
+          ports:
+            - containerPort: 8001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dnd-character
+  labels:
+    thing: character
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      thing: dnd-character
+  template:
+    metadata:
+      labels:
+        thing: dnd-character
+    spec:
+      containers:
+        - name: dnd-character
+          image: dnd-character
+          ports:
+            - containerPort: 8002
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dnd-combat
+  labels:
+    thing: combat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      thing: dnd-combat
+  template:
+    metadata:
+      labels:
+        thing: dnd-combat
+    spec:
+      containers:
+        - name: dnd-combat
+          image: dnd-combat
+          ports:
+            - containerPort: 8003
+          env:
+            - name: DICE_URL
+              value: http://dnd-dice:8001
+            - name: CHARACTER_URL
+              value: http://dnd-character:8002
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dnd-gateway
+  labels:
+    thing: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      thing: dnd-gateway
+  template:
+    metadata:
+      labels:
+        thing: dnd-gateway
+    spec:
+      containers:
+        - name: dnd-gateway
+          image: dnd-gateway
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DICE_URL
+              value: http://dnd-dice:8001
+            - name: CHARACTER_URL
+              value: http://dnd-character:8002
+            - name: COMBAT_URL
+              value: http://dnd-combat:8003
+---

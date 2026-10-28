@@ -1,6 +1,8 @@
 from python:3.11-slim
 workdir /app
 
-run pip install uvicorn httpx2 fastapi
+run pip install uvicorn httpx fastapi
+
 copy . .
-cmd ["python", "-m", "uvicorn", "main:app", "--app-dir", "services/dice", "--port", "8001"]
+expose 8001
+cmd ["python", "-m", "uvicorn", "main:app", "--app-dir", "services/dice", "--host", "0.0.0.0", "--port", "8001"]
