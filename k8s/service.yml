@@ -62,6 +62,6 @@ spec:
     targetPort: 8000
   selector:
     thing: dnd-gateway
-  type: ClusterIP
+  type: LoadBalancer
 status:
   loadBalancer: {}
