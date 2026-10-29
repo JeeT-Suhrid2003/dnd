@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: dnd-dice
-          image: ejeet26/dnd-dice:latest
+          image: ejeet2026/dnd-dice:latest
           ports:
             - containerPort: 8001
 ---
@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
         - name: dnd-character
-          image: ejeet26/dnd-character:latest
+          image: ejeet2026/dnd-character:latest
           ports:
             - containerPort: 8002
 ---
@@ -60,7 +60,7 @@ spec:
     spec:
       containers:
         - name: dnd-combat
-          image: ejeet26/dnd-combat:latest
+          image: ejeet2026/dnd-combat:latest
           ports:
             - containerPort: 8003
           env:
@@ -87,7 +87,7 @@ spec:
     spec:
       containers:
         - name: dnd-gateway
-          image: ejeet26/dnd-gateway:latest
+          image: ejeet2026/dnd-gateway:latest
           ports:
             - containerPort: 8000
           env:
