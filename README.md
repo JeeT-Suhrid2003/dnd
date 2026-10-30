@@ -60,6 +60,20 @@ Open **http://localhost:8111/**. To use a different host port, set
 starting Compose. Stop the services with `Ctrl+C`, or run
 `docker compose down` in another terminal.
 
+## Apply Kubernetes Services with Terraform
+
+Terraform applies every Service document in `k8s/service.yml` to the Kubernetes
+cluster selected by the current kubeconfig context. Ensure `kubectl` is
+configured for the target cluster, then run these commands from the repository
+root:
+
+    terraform -chdir=terraform init
+    terraform -chdir=terraform plan
+    terraform -chdir=terraform apply
+
+To use a kubeconfig at a different path, pass `-var="kubeconfig_path=<path>"`
+to both `plan` and `apply`.
+
 ## Try it (through the gateway)
 
     curl -X POST localhost:8000/dice/roll -H 'content-type: application/json' -d '{"notation":"4d6kh3"}'
