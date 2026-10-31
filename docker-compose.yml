@@ -12,8 +12,34 @@ services:
       context: .
       dockerfile: services/character/Dockerfile
     container_name: dnd-character
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-dnd}
+      DB_USER: ${POSTGRES_USER:-dnd}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-dnd-dev-password}
     expose:
       - "8002"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    container_name: dnd-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dnd}
+      POSTGRES_USER: ${POSTGRES_USER:-dnd}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dnd-dev-password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - character_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   combat:
     build:
@@ -34,4 +60,7 @@ services:
       - dice
       - character
       - combat
+
+volumes:
+  character_db_data:
     

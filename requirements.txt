@@ -3,3 +3,4 @@ uvicorn[standard]
 httpx
 httpx2
 pytest
+psycopg[binary]

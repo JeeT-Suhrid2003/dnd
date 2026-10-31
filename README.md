@@ -7,7 +7,7 @@ Phase 1: everything runs locally as separate processes. Docker and orchestration
 |-----------|------|-------------------------------------------------------|
 | gateway   | 8000 | Single entry point, routes to the services below      |
 | dice      | 8001 | Rolls dice (`2d6+3`, `4d6kh3`, d20 advantage)          |
-| character | 8002 | Character / monster sheets (in-memory)                |
+| character | 8002 | Character / monster sheets (PostgreSQL)               |
 | combat    | 8003 | Initiative and attacks; calls dice + character        |
 
 Services find each other through env vars (`DICE_URL`, `CHARACTER_URL`, `COMBAT_URL`),
@@ -20,7 +20,17 @@ defaulting to localhost, so the same code works in Docker later by changing only
     pytest tests -q
 
 On Windows PowerShell, start each service in a separate terminal from the project
-folder:
+folder. Start the database first with Docker:
+
+    docker compose up -d db
+
+Then set the database connection details for the character service:
+
+    $env:DB_HOST="localhost"
+    $env:DB_PORT="5432"
+    $env:DB_NAME="dnd"
+    $env:DB_USER="dnd"
+    $env:DB_PASSWORD="dnd-dev-password"
 
     python -m uvicorn main:app --app-dir services\dice --port 8001
     python -m uvicorn main:app --app-dir services\character --port 8002
@@ -57,8 +67,14 @@ From the repository root, build and start all services:
 
 Open **http://localhost:8111/**. To use a different host port, set
 `GATEWAY_PORT` (for example, `$env:GATEWAY_PORT=8000` in PowerShell) before
-starting Compose. Stop the services with `Ctrl+C`, or run
-`docker compose down` in another terminal.
+starting Compose. PostgreSQL stores character data in the `character_db_data`
+named volume, which survives container restarts and `docker compose down`.
+Remove the database as well with `docker compose down -v`. Set `POSTGRES_PASSWORD`
+before starting Compose to override the development-only default password.
+
+The character-service integration tests use a PostgreSQL database configured by
+`TEST_DATABASE_URL`. Point it only at a disposable test database; tests clear its
+character and metadata tables.
 
 ## Apply Kubernetes Services with Terraform
 
@@ -74,6 +90,15 @@ root:
 To use a kubeconfig at a different path, pass `-var="kubeconfig_path=<path>"`
 to both `plan` and `apply`.
 
+The PostgreSQL Deployment uses the `dnd-postgres-data` PersistentVolumeClaim.
+Before applying `k8s/deployment.yml`, create the database password Secret:
+
+    kubectl create secret generic dnd-db-credentials --from-literal=password=your-strong-password
+    kubectl apply -f k8s/deployment.yml
+
+The character service connects to the in-cluster `dnd-postgres` Service. Do not
+commit the database password to the repository.
+
 ## Try it (through the gateway)
 
     curl -X POST localhost:8000/dice/roll -H 'content-type: application/json' -d '{"notation":"4d6kh3"}'
@@ -84,7 +109,7 @@ to both `plan` and `apply`.
 
 Seeded combatants: `aria` (Fighter, AC 16) and `goblin` (AC 15, 7 HP).
 Open **Create character** from the game header to add another player or monster.
-Characters are in-memory and appear in initiative the next time an encounter starts.
+Characters are stored in PostgreSQL and appear in initiative the next time an encounter starts.
 Reset HP with `POST /characters/goblin/reset`.
 
 ## Dice notation
